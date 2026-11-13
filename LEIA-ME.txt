@@ -1,0 +1,159 @@
+DISCÓRDIAHUB - APLICATIVO COM JANELA PRÓPRIA (Electron)
+===================================================
+
+NOVIDADES DA VERSÃO 1.6.0
+- ATUALIZAÇÃO AUTOMÁTICA (opcional, precisa de um repositório PÚBLICO no GitHub):
+    1) Em package.json > build > publish, troque SEU-USUARIO e SEU-REPOSITORIO pelos do seu
+       repositório. Enquanto estiverem assim, a atualização fica desligada, sem nenhum erro.
+    2) Para publicar uma versão: aumente "version" no package.json, crie a tag (ex.: v1.6.1) e
+       aguarde o build. A Release recebe o instalador, o latest.yml e o .blockmap (são esses dois
+       últimos que o atualizador lê).
+    3) Quem tem o programa instalado é avisado: ele procura ao abrir e a cada 6 horas, baixa em
+       segundo plano e mostra no alto da tela "Atualização X pronta: reiniciar". Se a pessoa não
+       clicar, instala quando fechar o programa. Configurações > "Procurar atualização" força a busca.
+    A 1.6.0 em si precisa ser instalada à mão; da próxima versão em diante o aviso aparece sozinho.
+    Repositório privado não funciona. O instalador continua sem assinatura digital.
+- TEMA CLARO/ESCURO À ESCOLHA: Configurações > Tema (Automático segue o computador). Fica lembrado.
+- JANELAS ACESSÍVEIS: ao abrir uma janela (Configurações, Transmitir, Tocar, Escolher fontes) o
+  fundo fica bloqueado, o Tab e o Shift+Tab não escapam dela, o Esc fecha e o foco volta ao botão
+  de onde você veio. Cada participante é anunciado pelo nome para leitores de tela, e quem prefere
+  menos movimento no Windows (Efeitos de animação desligados) não vê transições.
+
+NOVIDADES DA VERSÃO 1.5.0
+- A CONEXÃO SE RECUPERA SOZINHA: se a internet de alguém oscilar ou o Wi-Fi cair e voltar,
+  o DiscórdiaHub refaz o caminho de rede sem tirar ninguém da sala. Antes a call podia ficar
+  muda até a pessoa sair e entrar.
+- POLÍTICA DE SEGURANÇA MAIS ESTRITA: a página não executa mais scripts embutidos arbitrários.
+  Só roda o script próprio, identificado por um hash que é atualizado sozinho em "npm start" e no
+  build. Se você editar o sala.html, rode "npm run selar" (ou apenas "npm start").
+- Verificação de permissões do aplicativo confere a origem de quem pergunta.
+- "Copiar diagnóstico" em Configurações: copia um relatório para colar numa mensagem quando algo
+  der errado (versão, conexões, tipo de rota e últimos eventos; sem o código da sala nem dados do TURN).
+- TESTES AUTOMÁTICOS NO PROJETO: pasta tests/ (veja tests/README.txt). "npm test" roda a página em
+  navegadores de teste com dois e três participantes. O GitHub também roda sozinho (aba Actions > Testes).
+- ROTEIRO-DE-TESTE.txt: 22 passos para conferir no Windows o que os testes automáticos não cobrem
+  (instalador, ícone perto do relógio, X em segundo plano, escolha de tela, player, queda de rede).
+
+NOVIDADES DA VERSÃO 1.4.0
+- PLAYER DE MÚSICA E VÍDEO: na barra da call, o botão com a nota musical ("Tocar
+  música ou vídeo") abre uma janela para colar um link. O player aparece para quem
+  está na call e fica em destaque. Qualquer pessoa pode dar play, pausar, mudar a
+  posição e parar. O volume é sempre individual.
+    * Sincronizados (play, pause, posição e stop): YouTube, vídeos da Twitch e
+      arquivos https .mp3, .m4a, .ogg, .wav, .flac, .mp4, .webm.
+    * Live da Twitch: play e pause sincronizados, sem posição.
+    * Spotify, TikTok e clipes da Twitch: o player aparece para todos, mas cada um
+      controla o seu (esses serviços não permitem controle de fora). O stop do
+      DiscórdiaHub fecha para todos. No Spotify, sem login só tocam trechos de 30 s.
+    * Links curtos do TikTok (vm.tiktok.com) não funcionam: use o endereço completo.
+    * Quem entra na call depois recebe o player já na posição certa. O botão de
+      setas circulares sincroniza de novo se alguém se atrasar.
+- Para os players do YouTube, Twitch, Spotify e TikTok funcionarem, o aplicativo agora
+  serve a página por um endereço só deste computador (http://localhost:47318). Isso
+  não abre nada para a rede. Efeito colateral: as configurações guardadas (foto,
+  TURN, microfone, volume etc.) são reiniciadas uma vez ao atualizar para a 1.4.0.
+- A política de segurança da página passou a permitir esses serviços (youtube.com,
+  twitch.tv, spotify.com, tiktok.com) e arquivos de áudio/vídeo por https.
+- Quem ainda está na 1.3.0 continua entrando na mesma sala, mas não vê o player.
+
+NOVIDADES DA VERSÃO 1.3.0 (LEIA ANTES DE ATUALIZAR)
+- ATENÇÃO: o protocolo de sala mudou (chave e tópico derivados juntos, mais seguro).
+  Todos os amigos precisam instalar a 1.3.0: quem estiver na 1.2.0 ou anterior
+  não entra na mesma sala que quem está na 1.3.0.
+- O código da sala agora precisa de pelo menos 12 letras ou números (o botão
+  Gerar cria um código forte). Códigos curtos ou fáceis de adivinhar enfraquecem
+  a proteção da sala: prefira sempre o Gerar.
+- O chat usa o nome real de quem enviou (ninguém consegue se passar por outro
+  amigo ou pelo aviso "Sala" no chat).
+- Arquivos com tamanho diferente do anunciado são recusados.
+- Ao esconder a janela com microfone, câmera ou tela ligados, o aplicativo avisa
+  e o ícone perto do relógio mostra que há captura ativa.
+- O compartilhamento de tela só usa a tela/janela que você escolheu.
+- Atualizado para o Electron 45 (a versão 33 não recebe mais correções).
+- O chat guarda só as últimas 300 mensagens (libera memória em sessões longas).
+
+É o mesmo sala.html, mas dentro de um aplicativo: abre numa janela própria, sem
+navegador, com ícone e instalador. Voz, tela, câmera, fotos e chat são os mesmos.
+No aplicativo, ao compartilhar a tela aparece uma janela para escolher qual
+tela ou janela mostrar e se o som do computador vai junto.
+
+COMO GERAR O INSTALADOR (no Windows)
+1. Instale o Node.js LTS: https://nodejs.org
+2. Abra o PowerShell dentro desta pasta e rode:
+     npm install
+     npm run dist
+3. O instalador fica em dist\DiscordiaHub-Setup-1.3.0.exe (instala só para o usuário,
+   cria atalhos no Menu Iniciar e na Área de Trabalho, em português).
+
+Para testar sem instalar: npm start
+
+ALTERNATIVA COM INNO SETUP
+  npm install
+  npm run pasta
+  Abra discordiahub.iss no Inno Setup 6.3 ou mais novo e use Build > Compile.
+  Saída: Output\DiscordiaHub-App-Setup.exe
+
+PARA PERSONALIZAR
+- Nome, versão e autor: package.json e as linhas #define do .iss.
+- Trocar a sala: substitua sala.html (e mantenha o bloco "pickSource" se gerar
+  de novo a partir de outra versão).
+- Atualizar o Electron: npm install electron@latest electron-builder@latest -D
+
+SEGUNDO PLANO
+- Ao clicar no X, a janela é escondida e o DiscórdiaHub continua rodando (a call segue
+  normal). Para abrir de novo, clique no ícone do DiscórdiaHub perto do relógio; para
+  fechar de verdade, clique com o botão direito no ícone > Sair.
+- Quem preferir que o X feche o aplicativo desliga a opção em Configurações >
+  "Ao fechar a janela (X), continuar em segundo plano".
+
+AVISOS
+- O instalador não é assinado digitalmente: o Windows pode mostrar "O Windows
+  protegeu o computador" (Mais informações > Executar assim mesmo). Só um
+  certificado de assinatura de código remove o aviso. Envie o instalador em
+  virustotal.com antes de distribuir.
+- O som do computador compartilhado inclui as vozes dos amigos: use fones, ou
+  eles ouvirão a si mesmos.
+- Se a conexão direta falhar com algum amigo, use "Avançado" na tela de entrada
+  para informar um servidor TURN (todos com os mesmos dados).
+
+SEM WINDOWS OU SEM INSTALAR O NODE: GERAR O INSTALADOR NA NUVEM (GitHub)
+1. Crie uma conta gratuita em github.com e um repositório novo.
+   Atenção: se for público, qualquer um vê os arquivos. Não coloque senhas de
+   TURN dentro do sala.html.
+2. Envie o conteúdo desta pasta para o repositório (inclusive a pasta .github).
+3. Aba Actions > "Gerar instalador" > Run workflow. Em uns 5 minutos o instalador
+   fica disponível em "Artifacts" (DiscordiaHub-Setup).
+4. Para ter um link de download fixo para os amigos: Releases > Draft a new
+   release > crie a tag v1.3.0 (ou rode "git tag v1.3.0 && git push --tags").
+   O instalador é anexado à Release automaticamente. Em repositório público,
+   qualquer pessoa baixa pelo link; em privado, só quem tem acesso ao repositório.
+
+COMO ENVIAR PARA OS AMIGOS
+- Use um link (Release do GitHub, Google Drive, OneDrive, Mega). Gmail e outros
+  serviços bloqueiam .exe e .zip com executáveis por e-mail.
+- Mande junto a assinatura SHA-256 do arquivo (aparece no log da Action ou com
+  "Get-FileHash" no PowerShell) para eles conferirem.
+- Avise sobre o aviso do Windows: Mais informações > Executar assim mesmo.
+
+PELO CMD (PROMPT DE COMANDO)
+Gerar o instalador:
+  cd /d C:\caminho\para\discordiahub-app
+  npm install
+  npm run dist
+  certutil -hashfile dist\DiscordiaHub-Setup-1.3.0.exe SHA256
+
+Instalar sem janelas (silencioso, só para o usuário atual):
+  DiscordiaHub-Setup-1.3.0.exe /S
+  (opcional: /D=C:\Jogos\DiscordiaHub  define a pasta; precisa ser o ÚLTIMO argumento)
+
+Baixar e instalar de uma vez (troque LINK pelo endereço do instalador):
+  curl -L -o "%TEMP%\DiscordiaHub-Setup.exe" "LINK"
+  certutil -hashfile "%TEMP%\DiscordiaHub-Setup.exe" SHA256
+  "%TEMP%\DiscordiaHub-Setup.exe" /S
+  start "" "%LOCALAPPDATA%\Programs\DiscordiaHub\DiscordiaHub.exe"
+
+Desinstalar em silêncio:
+  "%LOCALAPPDATA%\Programs\DiscordiaHub\Uninstall DiscordiaHub.exe" /S
+
+Com o instalador do Inno Setup (discordiahub.iss) os parâmetros são outros:
+  DiscordiaHub-App-Setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR="C:\Jogos\DiscordiaHub"
