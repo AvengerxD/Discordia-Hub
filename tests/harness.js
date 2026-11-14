@@ -8,7 +8,10 @@ const ARGS = ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-str
 // Recalcula o hash do script embutido e o escreve na política de segurança (CSP).
 function selarCsp(html) {
   const i = html.indexOf('<script>') + 8, j = html.indexOf('</script>', i);
-  const h = crypto.createHash('sha256').update(html.slice(i, j), 'utf8').digest('base64');
+  // O navegador troca CRLF por LF dentro do script antes de conferir o hash (regra do HTML), então o hash tem que
+  // ser calculado sobre o texto com LF, mesmo que o Git do Windows tenha gravado o arquivo com CRLF.
+  const txt = html.slice(i, j).replace(/\r\n?/g, '\n');
+  const h = crypto.createHash('sha256').update(txt, 'utf8').digest('base64');
   return html.replace(/script-src 'sha256-[^']*'/, "script-src 'sha256-" + h + "'");
 }
 // A página de produção precisa estar selada (rode "npm run selar" depois de editar o sala.html).
