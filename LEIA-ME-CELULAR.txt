@@ -1,0 +1,72 @@
+DISCÓRDIAHUB NO CELULAR (ANDROID E iOS)
+=======================================
+
+É o mesmo sala.html do computador, dentro de um aplicativo nativo feito com o Capacitor.
+Quem está no Windows, no Android e no iPhone entra na MESMA sala (o protocolo não mudou).
+
+O QUE FUNCIONA NO CELULAR
+- Voz, câmera, fotos, chat, emojis, player de música e vídeo, tema claro/escuro.
+- Android: enquanto o microfone ou a câmera estão ligados aparece uma notificação fixa
+  ("Microfone ATIVO") e o app continua vivo com a tela apagada ou em outro app.
+  O botão Voltar minimiza o app sem sair da call (e fecha janelas abertas antes).
+- iOS: modo "áudio em segundo plano" ligado, para a conversa continuar ao sair do app.
+
+O QUE NÃO EXISTE NO CELULAR
+- Compartilhar tela: o Android e o iOS não permitem isso a uma página dentro de um app comum.
+  O botão some sozinho. Quem transmite tela continua sendo o computador; o celular assiste.
+- Atualização automática (é feita pelo Windows) e a opção "segundo plano" das Configurações.
+
+ANTES DE COMEÇAR
+1. Troque o "appId" em capacitor.config.json (ex.: com.seugrupo.discordiahub) pelo seu.
+   Faça isso ANTES do primeiro "mobile:init": depois que o app é publicado, o id não muda mais.
+2. Node.js 22 ou mais novo (o mesmo do computador).
+
+ANDROID (Windows, Mac ou Linux)
+Pela nuvem, sem instalar nada: no GitHub, aba Actions > "Gerar app de celular" > Run workflow.
+Em uns 10 minutos o APK fica em Artifacts (DiscordiaHub-Android). Com uma tag (v1.6.1), vai para
+a página de Releases junto com o instalador do Windows.
+
+No seu computador:
+  1. Instale o Android Studio (traz o SDK e o Java).
+  2. npm install
+  3. npm run mobile:init        (cria a pasta android/, aplica permissões e o serviço de call)
+  4. npm run android:abrir      (abre no Android Studio; botão Run com o celular ligado por USB)
+     ou: npm run android:apk    (gera android\app\build\outputs\apk\debug\app-debug.apk)
+Para instalar o APK no celular dos amigos: enviar o arquivo e ativar "Instalar apps desconhecidos"
+para o app que abriu o arquivo. O APK de debug é assinado com uma chave de teste: serve para o grupo,
+mas NÃO serve para a Play Store (ela exige um pacote .aab assinado por você; veja a documentação
+do Capacitor, "Deploying to Google Play").
+
+iOS (precisa de um Mac com Xcode 26 ou mais novo)
+  1. npm install
+  2. npm run mobile:init        (cria a pasta ios/ e aplica as permissões de microfone, câmera e áudio)
+  3. npm run ios:abrir          (abre o Xcode)
+  4. No Xcode: App > Signing & Capabilities > escolha seu Team (um Apple ID grátis basta para testar
+     no seu próprio iPhone; o app expira em 7 dias) e aperte Run com o iPhone ligado.
+Para dar aos amigos: só pelo TestFlight (conta de desenvolvedor paga da Apple, US$ 99/ano). Não existe
+instalador avulso para iPhone como o .exe do Windows. O job "ios" do GitHub só confirma que o projeto
+compila no simulador; ele não gera nada instalável.
+
+DEPOIS DE EDITAR O sala.html
+  npm run selar     (atualiza o hash da política de segurança, igual ao computador)
+  npm run mobile:sync
+
+LIMITES CONHECIDOS (confira num aparelho de verdade; veja o ROTEIRO-DE-TESTE.txt, parte do celular)
+- YouTube no iPhone: o app abre a página como capacitor://localhost e o YouTube às vezes recusa
+  o player ("erro 153"). Se acontecer, use links de arquivo de áudio/vídeo ou Twitch. No Android a
+  página é https://localhost e costuma funcionar.
+- iOS em segundo plano: o sistema pode silenciar o microfone de uma página web mesmo com o modo
+  áudio. Teste com a tela bloqueada. Se for insuficiente, o caminho é um plugin nativo de WebRTC.
+- A política de segurança (CSP) do sala.html é estrita. Em Androids com o "Android System WebView"
+  muito antigo, o Capacitor pode não conseguir se injetar; atualize o WebView pela Play Store.
+- Os ícones saem do icone.ico (256 px, ampliado). Para ficar nítido, troque assets/icon-only.png
+  e assets/icon.png por imagens de 1024x1024 e rode: npx capacitor-assets generate
+
+COMO FUNCIONA POR DENTRO
+- capacitor.config.json: nome, id e pasta (www/) do app.
+- mobile/build-web.js: copia o sala.html (já selado) para www/index.html.
+- mobile/init.js: cria android/ e ios/ com o Capacitor e aplica os ajustes de forma repetível
+  (permissões, serviço de call, Info.plist). Pode rodar de novo à vontade.
+- mobile/android/: o serviço de call em segundo plano (Java), copiado para o projeto Android.
+- sala.html: bloco "Celular" no fim do script (detecta o app, esconde o botão de tela, liga o serviço,
+  trata o botão Voltar). No computador e no navegador esse bloco não faz nada.

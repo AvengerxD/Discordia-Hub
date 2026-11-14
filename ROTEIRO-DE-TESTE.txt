@@ -1,0 +1,111 @@
+ROTEIRO DE TESTE NO WINDOWS (cerca de 30 minutos, com 2 pessoas)
+================================================================
+Os testes automáticos cobrem a página, mas NÃO o aplicativo em si. Este roteiro cobre a parte
+que só dá para conferir num Windows de verdade. Em cada passo, marque OK ou FALHOU. Se algo
+falhar, abra Configurações (engrenagem na barra da call) > "Copiar diagnóstico" e cole o texto
+na mensagem, junto com o número do passo e uma captura de tela.
+
+Quem testa: pessoa A (computador principal) e pessoa B (outro computador, outra casa se possível).
+Ambas com a MESMA versão instalada.
+
+PARTE 1 - INSTALAÇÃO E ABERTURA (cada pessoa)
+ 1. Rode o instalador. O Windows pode mostrar "O Windows protegeu o computador": clique em
+    "Mais informações" > "Executar assim mesmo". Esperado: instala sem pedir senha de administrador.
+ 2. Abra pelo atalho da Área de Trabalho ou do Menu Iniciar. Esperado: abre uma janela própria
+    (sem barra de endereço) com o ícone do palhaço rosa e o nome DiscórdiaHub.
+ 3. Feche e abra de novo. Esperado: abre normalmente e só uma cópia por vez (abrir uma segunda
+    traz a primeira para a frente).
+ 4. Atualização (só se já tinha uma versão antiga): instale por cima. Esperado: atualiza sem
+    desinstalar. As configurações salvas (foto, microfone) podem ser reiniciadas uma vez.
+
+PARTE 2 - SALA, CHAT E CALL (A e B)
+ 5. Cada um digita nome e usa o mesmo código (A clica em "Gerar" e manda para B). Esperado:
+    entram na sala e se enxergam na lista "Na sala:". O chat avisa "Conectado com ... (conexão direta)".
+ 6. A e B escolhem microfone e câmera no "Entrar na call" (o medidor do microfone deve mexer ao falar).
+    Esperado: vozes se ouvem; a borda verde acende em quem fala; ouve-se o aviso sonoro quando o outro entra.
+ 7. B liga a câmera. Esperado: aparece no quadro de B para A, no lugar da foto.
+ 8. Volume: passe o mouse no quadro do amigo e mexa no controle de voz. Esperado: só o seu volume muda.
+
+PARTE 3 - TELA E ÁUDIO
+ 9. A clica no ícone da tela. Esperado: abre a janela "Transmitir tela" com a lista de telas e janelas
+    (com miniaturas) e a qualidade. Escolha uma janela de jogo e "Transmitir".
+10. B vê a tela de A em destaque. Teste 1080p 60 fps com um vídeo ou jogo em movimento.
+    Anote: fluidez (ótima, ok, trava) e se o som do computador chega.
+11. Se A compartilhar o som do computador, B não deve ouvir a própria voz de volta (se ouvir, A
+    precisa usar fones).
+
+PARTE 4 - SEGUNDO PLANO (parte mais importante do aplicativo)
+12. Com A na call, clique no X da janela. Esperado: a janela some, aparece o ícone perto do relógio
+    e o Windows mostra um aviso. B ainda ouve A. Passe o mouse no ícone: o texto deve dizer
+    "microfone, câmera ou tela ATIVOS".
+13. Clique no ícone perto do relógio. Esperado: a janela volta, a call continua sem corte.
+14. Clique no X de novo e depois com o botão direito no ícone > "Sair". Esperado: o programa fecha de
+    vez (não fica no Gerenciador de Tarefas).
+15. Em Configurações, desmarque "Ao fechar a janela (X), continuar em segundo plano". Clique no X.
+    Esperado: fecha de verdade.
+
+PARTE 5 - PLAYER DE MÚSICA E VÍDEO
+16. Clique no ícone de nota musical e cole um link do YouTube. Esperado: aparece para os dois em
+    destaque, tocando. Pause, dê play e mude a posição de um dos lados: o outro acompanha.
+17. Teste um link de vídeo da Twitch, um .mp3 ou .mp4 direto, um link do Spotify e um do TikTok.
+    Spotify e TikTok aparecem, mas cada um controla o seu. Anote qualquer um que NÃO apareça
+    (principalmente YouTube e Twitch: podem recusar o endereço local do aplicativo).
+
+PARTE 6 - QUEDA DE REDE
+18. Com a call ativa, desligue o Wi-Fi de A por uns 10 segundos e religue. Esperado: o áudio volta
+    sozinho em até cerca de 20 segundos, sem sair da sala. Se não voltar, copie o diagnóstico.
+19. Com A e B em redes diferentes (A no Wi-Fi, B no 4G), repita o passo 5. Se o chat disser
+    "bloqueia a conexão direta", anote: será preciso configurar um servidor TURN.
+
+PARTE 7 - TECLADO, TEMA E ATUALIZAÇÃO
+20. Só com o teclado: Tab até o botão da engrenagem, Enter. Esperado: abre Configurações e o foco entra
+    nela; Tab e Shift+Tab ficam dentro da janela; Esc fecha e o foco volta para a engrenagem.
+21. Em Configurações > Tema, teste Claro, Escuro e Automático (com o Windows em tema escuro, "Automático"
+    deve ficar escuro). Feche e abra o programa: a escolha deve continuar.
+22. Atualização automática (só depois de configurar o repositório e publicar duas versões seguidas):
+    instale a versão antiga e abra. Esperado: em até alguns minutos aparece o botão "Atualização X
+    pronta: reiniciar" no alto da tela (ou use Configurações > "Procurar atualização"). Clique nele:
+    o programa fecha e abre na versão nova, sem desinstalar nada. Se aparecer
+    "Atualização automática não configurada", falta preencher o repositório no package.json.
+
+COMO INVESTIGAR UM PROBLEMA (opcional)
+ - Abra o Prompt de Comando e rode:
+       set DISCORDIAHUB_DEBUG=1
+       "%LOCALAPPDATA%\Programs\DiscordiaHub\DiscordiaHub.exe"
+   (se o caminho for outro, use o da pasta onde o programa foi instalado). Abre também o painel de
+   ferramentas do desenvolvedor; a aba "Console" mostra os erros.
+ - "Copiar diagnóstico" (Configurações) já traz versão, sistema, estado de cada conexão, tipo de
+   rota (direta ou por retransmissão) e os últimos eventos. Não inclui o código da sala nem dados do TURN.
+
+
+ROTEIRO DE TESTE NO CELULAR (Android e iPhone, cerca de 20 minutos, com o computador na mesma sala)
+====================================================================================================
+Nada disso foi testado em aparelho de verdade ainda: este roteiro é como você descobre o que falta.
+Marque OK ou FALHOU. Se algo falhar, abra Configurações > "Copiar diagnóstico" e cole na mensagem.
+
+C1. O app abre e mostra a tela de entrada, sem faixas em branco no topo e embaixo (entalhe/câmera).
+C2. Entrar na mesma sala do computador com o código: aparece o participante do PC.
+C3. Ligar o microfone: o sistema pede permissão (só na primeira vez); o PC ouve a voz do celular.
+C4. Ligar a câmera: o PC vê o vídeo; trocar de câmera funciona (Configurações).
+C5. O botão "Compartilhar tela" NÃO aparece na barra da call do celular.
+C6. Ver a tela transmitida pelo PC, com som.
+C7. Chat nos dois sentidos, com o teclado aberto o campo de texto continua visível.
+C8. Android: com o microfone ligado aparece a notificação "Microfone ATIVO". Desligar microfone e
+    câmera: a notificação some.
+C9. Android: apertar Voltar numa janela aberta (Configurações) fecha a janela; sem janela, minimiza
+    o app e a call continua (o PC ainda ouve o celular).
+C10. Ir para outro app por 1 minuto, voltar: voz e vídeo seguem. Repetir com a tela bloqueada.
+     (iPhone: se o PC deixar de ouvir com a tela bloqueada, anote; é o limite descrito no LEIA-ME-CELULAR.)
+C11. Player: colar um link do YouTube e um arquivo .mp3/.mp4. No iPhone o YouTube pode dar "erro 153".
+C12. Desligar o Wi-Fi por 10 s e ligar: a call se recupera sem sair da sala.
+C13. Girar o celular: o layout se ajusta; a call não cai.
+C14. Tema claro/escuro seguem o do aparelho (Configurações > Tema).
+
+
+LOGIN DO TWITCH E DO SPOTIFY (Windows)
+ L1. Tocar música > link do Spotify > no player, clicar em Entrar: abre uma janela "Entrar" do próprio app
+     (não o navegador). Entrar com a conta e a janela fecha sozinha.
+ L2. Reabrir o app e o mesmo link: continua logado (os cookies ficam guardados).
+ L3. Twitch: link de um canal > Entrar no player: mesma janela de login, e o player recarrega logado.
+ Observação: o Spotify só toca músicas INTEIRAS para contas Premium e com suporte a DRM (Widevine).
+ Se logar mas continuar tocando só 30 s, veja o LEIA-ME.

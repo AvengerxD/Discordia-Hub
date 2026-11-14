@@ -1,0 +1,21 @@
+name: Testes
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run selar
+      - run: git diff --exit-code sala.html   # falha se o hash da política de segurança estava desatualizado
+      - run: node mobile/build-web.js   # confere que a pasta do app de celular é gerada
+      - run: npm test

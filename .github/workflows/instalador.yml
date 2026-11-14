@@ -1,0 +1,49 @@
+name: Gerar instalador
+
+on:
+  workflow_dispatch:        # botão "Run workflow" na aba Actions
+  push:
+    tags: ["v*"]            # ou: criar uma tag como v1.6.0
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Com package-lock.json no repositório o build é reproduzível (npm ci).
+      - name: Instalar dependências (reproduzível)
+        if: hashFiles('package-lock.json') != ''
+        run: npm ci
+      - name: Instalar dependências
+        if: hashFiles('package-lock.json') == ''
+        run: npm install
+      - run: npm run dist
+      - name: Assinatura SHA-256 do instalador
+        shell: pwsh
+        run: |
+          $f = Get-ChildItem dist/DiscordiaHub-Setup-*.exe | Select-Object -First 1
+          $h = (Get-FileHash $f.FullName -Algorithm SHA256).Hash
+          "$h  $($f.Name)" | Tee-Object -FilePath dist/SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DiscordiaHub-Setup
+          path: |
+            dist/DiscordiaHub-Setup-*.exe
+            dist/*.blockmap
+            dist/latest.yml
+            dist/SHA256.txt
+      - name: Publicar na página de Releases (só com tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/DiscordiaHub-Setup-*.exe
+            dist/*.blockmap
+            dist/latest.yml
+            dist/SHA256.txt

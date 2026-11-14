@@ -1,0 +1,69 @@
+{
+  "name": "discordiahub",
+  "version": "1.6.0",
+  "description": "DiscórdiaHub: tela, voz, câmera, fotos e chat com amigos",
+  "main": "main.js",
+  "author": "Seu nome ou do seu grupo",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --publish never",
+    "pasta": "electron-builder --win --dir",
+    "selar": "node tests/selar.js",
+    "prestart": "node tests/selar.js",
+    "predist": "node tests/selar.js",
+    "prepasta": "node tests/selar.js",
+    "test": "node tests/suite.js && node tests/media-suite.js",
+    "mobile:init": "node mobile/init.js",
+    "mobile:sync": "node mobile/build-web.js && npx cap sync",
+    "android:abrir": "npm run mobile:sync && npx cap open android",
+    "android:apk": "npm run mobile:sync && cd android && gradlew assembleDebug",
+    "ios:abrir": "npm run mobile:sync && npx cap open ios"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "electron": "^45.0.0",
+    "electron-builder": "^26.0.0",
+    "playwright": "^1.50.0"
+  },
+  "build": {
+    "appId": "com.seugrupo.salap2p",
+    "productName": "DiscordiaHub",
+    "artifactName": "DiscordiaHub-Setup-${version}.${ext}",
+    "files": [
+      "main.js",
+      "preload.js",
+      "sala.html",
+      "icone.ico"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icone.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DiscórdiaHub",
+      "language": "1046"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "AvengerxD",
+        "repo": "Discordia-Hub"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  }
+}

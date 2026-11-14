@@ -1,0 +1,15 @@
+{
+  "appId": "com.seugrupo.discordiahub",
+  "appName": "DiscórdiaHub",
+  "webDir": "www",
+  "backgroundColor": "#14161F",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "never"
+  }
+}

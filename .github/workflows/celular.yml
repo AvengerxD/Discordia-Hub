@@ -1,0 +1,73 @@
+name: Gerar app de celular
+
+on:
+  workflow_dispatch:        # botão "Run workflow" na aba Actions
+  push:
+    tags: ["v*"]            # ou: criar uma tag como v1.6.1
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Instalar dependências
+        run: npm install
+      - name: Criar e ajustar o projeto Android
+        run: node mobile/init.js android
+      - name: Gerar o APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - name: Nomear o APK
+        run: |
+          mkdir -p saida
+          cp android/app/build/outputs/apk/debug/app-debug.apk saida/DiscordiaHub-Android.apk
+          sha256sum saida/DiscordiaHub-Android.apk | tee saida/SHA256-android.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DiscordiaHub-Android
+          path: saida/*
+      - name: Publicar na página de Releases (só com tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: saida/*
+
+  ios:
+    # Sem certificado da Apple não existe .ipa instalável: este job só confirma que o projeto iOS compila
+    # (no simulador) e guarda o app de simulador. Para instalar num iPhone, use o Xcode num Mac (LEIA-ME-CELULAR.txt).
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Instalar dependências
+        run: npm install
+      - name: Criar e ajustar o projeto iOS
+        run: node mobile/init.js ios
+      - name: Compilar para o simulador
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+      - name: Compactar o app de simulador
+        run: |
+          mkdir -p saida
+          cd build/Build/Products/Debug-iphonesimulator && zip -qr "$GITHUB_WORKSPACE/saida/DiscordiaHub-iOS-simulador.zip" App.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DiscordiaHub-iOS-simulador
+          path: saida/*
