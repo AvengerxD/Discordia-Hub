@@ -24,6 +24,21 @@ jobs:
         run: npm install
       - name: Criar e ajustar o projeto Android
         run: node mobile/init.js android
+      # A atualização automática só funciona se TODO APK for assinado com a MESMA chave.
+      # Crie a chave uma vez com "npm run mobile:chave" e cadastre os 4 segredos no GitHub (LEIA-ME-CELULAR.txt).
+      - name: Preparar a chave de assinatura
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/discordiahub.keystore"
+            echo "DH_KEYSTORE=$RUNNER_TEMP/discordiahub.keystore" >> "$GITHUB_ENV"
+            echo "DH_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "DH_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> "$GITHUB_ENV"
+            echo "DH_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Sem ANDROID_KEYSTORE_BASE64: o APK sai com chave de teste aleatória e NÃO vai atualizar por cima de uma versão já instalada."
+          fi
       - name: Gerar o APK
         working-directory: android
         run: ./gradlew assembleDebug

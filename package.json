@@ -1,6 +1,6 @@
 {
   "name": "discordiahub",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "DiscórdiaHub: tela, voz, câmera, fotos e chat com amigos",
   "main": "main.js",
   "author": "Seu nome ou do seu grupo",
@@ -19,7 +19,8 @@
     "mobile:sync": "node mobile/build-web.js && npx cap sync",
     "android:abrir": "npm run mobile:sync && npx cap open android",
     "android:apk": "npm run mobile:sync && cd android && gradlew assembleDebug",
-    "ios:abrir": "npm run mobile:sync && npx cap open ios"
+    "ios:abrir": "npm run mobile:sync && npx cap open ios",
+    "mobile:chave": "node mobile/gerar-chave.js"
   },
   "devDependencies": {
     "@capacitor/android": "^8.0.0",

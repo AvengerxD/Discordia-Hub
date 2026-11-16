@@ -13,3 +13,7 @@ ios/DerivedData/
 .DS_Store
 *.apk
 *.aab
+
+*.keystore
+*.jks
+discordiahub-keystore-base64.txt

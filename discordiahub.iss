@@ -2,7 +2,7 @@
 ; Passos: npm install > npm run pasta > abrir este arquivo no Inno Setup > Build > Compile.
 
 #define MyAppName "DiscórdiaHub"
-#define MyAppVersion "1.6.1"
+#define MyAppVersion "1.6.2"
 #define MyAppPublisher "Seu nome ou do seu grupo"
 #define MyAppExe "DiscordiaHub.exe"
 

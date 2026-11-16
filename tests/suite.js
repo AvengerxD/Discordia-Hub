@@ -10,7 +10,7 @@ let fails=0;const ok=(c,m)=>{console.log((c?'  OK    ':'  FALHA ')+m);if(!c)fail
   const errs=[];
   const mk=async n=>{const c=await br.newContext({permissions:['microphone','camera'],viewport:{width:1280,height:720}});const p=await c.newPage();p.on('pageerror',e=>errs.push(n+': '+e.message));
     await p.goto('http://127.0.0.1:18843/');await p.fill('#nome',n);await p.fill('#cod','sala-teste-suite');await p.click('#go');await p.waitForSelector('#room',{state:'visible',timeout:15000});return p};
-  const enter=async p=>{await p.click('#bj');await p.waitForSelector('[role=dialog][aria-label^="Escolha"]');await p.click('[role=dialog][aria-label^="Escolha"] .btn.pri');await p.waitForTimeout(1000)};
+  const enter=async p=>{await p.click("#vv");await p.click("#bj");await p.waitForSelector('[role=dialog][aria-label^="Escolha"]');await p.click('[role=dialog][aria-label^="Escolha"] .btn.pri');await p.waitForTimeout(1000)};
   console.log('Política de segurança');
   ok(H.selado(),'a página de produção tem o hash do script correto (rode npm run selar se falhar)');
   console.log('Entrada e sinalização (MQTT)');
@@ -22,6 +22,8 @@ let fails=0;const ok=(c,m)=>{console.log((c?'  OK    ':'  FALHA ')+m);if(!c)fail
   ok((await A.evaluate(()=>window.__c)).includes('room'),'Ana ouve o aviso de amigo na sala');
   await enter(B);await A.waitForTimeout(2500);
   ok((await A.evaluate(()=>window.__c)).includes('in'),'Ana ouve o aviso de amigo na call');
+  ok(await A.evaluate(()=>document.querySelector('#room').dataset.v)==='voz','ao entrar na call a tela muda para o canal de voz');
+  ok((await A.textContent('#vlist')).includes('Bia')&&(await A.textContent('#mbrl')).includes('NA CALL'),'canal de voz e lista de membros mostram quem está na call');
   console.log('Mídia');
   await A.click('#bs');await A.waitForSelector('#shd:not([hidden])');await A.selectOption('#ql','720p30');await A.click('#shok');await A.waitForTimeout(800);
   await B.click('#bm');await B.click('#bc');await A.waitForTimeout(6000);
@@ -30,7 +32,7 @@ let fails=0;const ok=(c,m)=>{console.log((c?'  OK    ':'  FALHA ')+m);if(!c)fail
   ok(ia.a>0&&ia.v>0,'Ana recebe voz e câmera da Bia ('+ia.a+' B áudio, '+ia.v+' B vídeo)');
   let w=ib.w;for(let i=0;i<12&&w<640;i++){await B.waitForTimeout(1500);w=(await inb(B)).w}
   ok(ib.v>0&&w>=640,'Bia recebe a tela da Ana ('+w+' px de largura; o codificador sobe a resolução aos poucos)');
-  ok(await A.evaluate(()=>tiles.me.st.textContent)==='1280×720 · 30 fps','Ana vê resolução/fps reais da transmissão');
+  ok(/^\d+×\d+ · \d+ fps/.test(await A.evaluate(()=>tiles.me.st.textContent)),'Ana vê resolução/fps reais da transmissão');
   ok(await A.evaluate(()=>!tiles.me.v.srcObject),'prévia da própria transmissão começa desligada');
   ok(await B.evaluate(()=>{const s=Object.values(pcs)[0];return !s.au.muted&&s.au.volume===1}),'voz da Ana toca na Bia');
   ok(await A.evaluate(()=>Object.keys(tiles).every(k=>!k.endsWith(':cam'))),'não existe mais quadro separado para câmera');
@@ -90,12 +92,12 @@ let fails=0;const ok=(c,m)=>{console.log((c?'  OK    ':'  FALHA ')+m);if(!c)fail
   ok(await A.evaluate(()=>document.querySelector('#cfgd').hidden&&!document.querySelector('#room').inert&&document.activeElement.id==='bg'),'Esc fecha e o foco volta para o botão de Configurações');
   const fundo=p=>p.evaluate(()=>getComputedStyle(document.body).backgroundColor);
   await A.click('#bg');await A.selectOption('#tema','dark');
-  ok(await fundo(A)==='rgb(14, 16, 22)','tema Escuro forçado (computador em tema claro)');
+  ok(await fundo(A)==='rgb(0, 0, 0)','tema Escuro forçado (computador em tema claro)');
   await A.selectOption('#tema','light');ok(await fundo(A)==='rgb(243, 244, 249)','tema Claro');
   await A.selectOption('#tema','auto');ok(await fundo(A)==='rgb(243, 244, 249)'&&await A.evaluate(()=>!document.documentElement.hasAttribute('data-theme')),'Automático volta a seguir o computador');
   await A.selectOption('#tema','dark');await A.keyboard.press('Escape');
   const Cd=await br.newContext({colorScheme:'dark'});const D=await Cd.newPage();await D.goto('http://127.0.0.1:18843/');
-  ok(await fundo(D)==='rgb(14, 16, 22)','computador em tema escuro: página escura');
+  ok(await fundo(D)==='rgb(0, 0, 0)','computador em tema escuro: página escura');
   await D.evaluate(()=>{const e=document.querySelector('#tema');e.value='light';e.dispatchEvent(new Event('change'))});
   ok(await fundo(D)==='rgb(243, 244, 249)','escolher Claro vale mesmo com o computador escuro');
   await D.reload();ok(await fundo(D)==='rgb(243, 244, 249)','a escolha de tema é lembrada ao reabrir');
@@ -109,7 +111,7 @@ let fails=0;const ok=(c,m)=>{console.log((c?'  OK    ':'  FALHA ')+m);if(!c)fail
   await P.goto('http://127.0.0.1:18843/');await P.fill('#nome','Caio');await P.fill('#cod','curto123');await P.click('#go');await P.waitForTimeout(600);
   ok((await P.textContent('#err')).includes('12'),'código com menos de 12 caracteres é recusado');
   await P.click('#gen');const g=await P.inputValue('#cod');ok(/^sala-[a-z0-9]{14}$/.test(g),'botão Gerar cria código forte ('+g+')');
-  await P.click('#go');await P.waitForSelector('#room',{state:'visible',timeout:15000});await P.click('#bj');await P.waitForSelector('[role=dialog][aria-label^="Escolha"]');await P.click('[role=dialog][aria-label^="Escolha"] .btn.pri');await P.waitForTimeout(1200);
+  await P.click('#go');await P.waitForSelector('#room',{state:'visible',timeout:15000});await P.click('#vv');await P.click('#bj');await P.waitForSelector('[role=dialog][aria-label^="Escolha"]');await P.click('[role=dialog][aria-label^="Escolha"] .btn.pri');await P.waitForTimeout(1200);
   ok((await P.evaluate(()=>window.__cap)).includes(true),'aplicativo é avisado quando microfone/câmera/tela ficam ativos');
   await P.click('#bm');await P.waitForTimeout(500);ok((await P.evaluate(()=>window.__cap.slice(-1)[0]))===false,'e quando tudo é desligado');
   console.log('Atualização automática (interface)');

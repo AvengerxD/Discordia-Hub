@@ -1,0 +1,11 @@
+# Mantém o sala.html (e os demais arquivos de código) com quebras de linha LF em qualquer computador.
+# Com CRLF o hash da política de segurança deixava de bater e a página não executava.
+* text=auto
+*.html text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.java text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.iss text eol=crlf

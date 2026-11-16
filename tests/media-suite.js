@@ -32,7 +32,7 @@ const FAKE_TW=`window.Twitch={Player:function(el,o){const me=this,ev={};me.__opt
     await c.route(/open\.spotify\.com|tiktok\.com|clips\.twitch\.tv/,r=>r.abort());
     const p=await c.newPage();p.on('pageerror',e=>errs.push(n+': '+e.message));
     await p.goto('http://127.0.0.1:18863/');await p.fill('#nome',n);await p.fill('#cod','sala-midia-teste-01');await p.click('#go');await p.waitForSelector('#room',{state:'visible',timeout:15000});return p};
-  const enter=async p=>{await p.click('#bj');await p.waitForSelector('[role=dialog][aria-label^="Escolha"]');await p.click('[role=dialog][aria-label^="Escolha"] .btn.pri');await p.waitForTimeout(900)};
+  const enter=async p=>{await p.click("#vv");await p.click("#bj");await p.waitForSelector('[role=dialog][aria-label^="Escolha"]');await p.click('[role=dialog][aria-label^="Escolha"] .btn.pri');await p.waitForTimeout(900)};
   const play=async(p,link)=>{await p.click('#bmd');await p.fill('#mlk',link);await p.click('#mok')};
   const btn=(p,i)=>p.locator('.mbar button').nth(i);   // 0=play/pause 1=stop 2=mudo 3=sync
   const A=await mk('Ana'),B=await mk('Bia');await A.waitForTimeout(800);await enter(A);await enter(B);await A.waitForTimeout(2000);

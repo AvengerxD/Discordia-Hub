@@ -14,7 +14,8 @@ O QUE FUNCIONA NO CELULAR
 O QUE NÃO EXISTE NO CELULAR
 - Compartilhar tela: o Android e o iOS não permitem isso a uma página dentro de um app comum.
   O botão some sozinho. Quem transmite tela continua sendo o computador; o celular assiste.
-- Atualização automática (é feita pelo Windows) e a opção "segundo plano" das Configurações.
+- A opção "segundo plano" das Configurações (no Android o serviço de call já faz isso).
+- Atualização automática no iPhone: o iOS não permite. Só pelo TestFlight/App Store (ou reinstalando pelo Xcode).
 
 ANTES DE COMEÇAR
 1. Troque o "appId" em capacitor.config.json (ex.: com.seugrupo.discordiahub) pelo seu.
@@ -47,6 +48,66 @@ Para dar aos amigos: só pelo TestFlight (conta de desenvolvedor paga da Apple, 
 instalador avulso para iPhone como o .exe do Windows. O job "ios" do GitHub só confirma que o projeto
 compila no simulador; ele não gera nada instalável.
 
+ATUALIZAÇÃO AUTOMÁTICA NO ANDROID
+O app confere a última Release do GitHub ao abrir (e a cada 6 horas). Se achar uma versão maior, aparece
+o botão "Atualização X.Y.Z disponível: instalar" e um aviso no chat. Também dá para forçar em
+Configurações > "Procurar atualização". Ao tocar, o app baixa o APK e abre o instalador do Android.
+O Android SEMPRE pede um "Atualizar?" no final: instalação totalmente silenciosa só existe na Play Store.
+Na primeira vez ele também pede para liberar "Instalar apps desconhecidos" para o DiscórdiaHub.
+
+Para funcionar (faça uma vez):
+  1. package.json > build > publish: "owner" e "repo" com os seus dados (o publicar-github.bat já faz isso).
+     O repositório precisa ser PÚBLICO (igual ao atualizador do Windows).
+  2. Crie a chave de assinatura:  npm run mobile:chave
+     Ele gera discordiahub.keystore e mostra 4 valores. No GitHub: Settings > Secrets and variables >
+     Actions > New repository secret, e cadastre: ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+     ANDROID_KEY_ALIAS e ANDROID_KEY_PASSWORD.
+     Por quê: o Android só atualiza por cima se o APK novo tiver a MESMA assinatura do instalado. Sem a chave
+     fixa, cada build do GitHub sai com uma chave aleatória e a atualização é recusada.
+     GUARDE o discordiahub.keystore e a senha: se perder, todo mundo terá que desinstalar e reinstalar.
+  3. Para lançar uma versão nova: suba a versão no package.json e crie a tag (o publicar-github.bat faz
+     os dois). O GitHub gera o APK "DiscordiaHub-Android.apk" e o anexa à Release. O número do package.json
+     vira o versionName/versionCode do app (1.6.1 -> 10601), então a versão tem que SUBIR a cada release.
+
+ATENÇÃO: quem já tem o APK antigo (feito antes desta mudança, com outra chave) precisa desinstalar e instalar
+o APK novo UMA vez. Dali em diante as atualizações entram por cima.
+
+NOVA TELA (ESTILO SERVIDOR)
+Barra de salas à esquerda, coluna de canais (texto "geral" e voz "Call", com quem está na call embaixo, AO VIVO
+para quem transmite e ícone de microfone cortado), chat no centro e lista de membros à direita. Ao entrar na sala
+você começa no chat; ao entrar na call a tela vai sozinha para o canal de voz (vídeos e transmissões), com o chat ao
+lado. O painel do usuário (canto inferior esquerdo) tem microfone, silenciar call e configurações; a foto de perfil
+se troca clicando nela. No celular, o menu (três riscos) abre a coluna de canais. O tema escuro agora é preto,
+e o claro continua disponível em Configurações.
+
+PUBLICAR ATUALIZAÇÕES COM DOIS CLIQUES
+Depois de editar o app (por exemplo o sala.html), abra o ATUALIZAR.bat. Ele sela o arquivo, roda os testes, sobe a
+versão sozinho (1.6.0 -> 1.6.1), envia para o GitHub, cria a tag e espera o GitHub gerar o instalador do Windows e o
+APK do Android, avisando quando estiver tudo pronto. Os amigos recebem sozinhos (veja acima). Na primeira vez ele
+chama o publicar-github (pergunta usuário e repositório). Opções: ATUALIZAR.bat -Rapido (sem testes),
+-Tipo minor (1.6.0 -> 1.7.0), -Versao 2.0.0, -Mensagem "o que mudou".
+
+TRANSMISSÃO DE TELA/JOGO TRAVANDO
+Cada amigo que assiste recebe uma cópia separada direto do seu computador, então o upload é dividido: 1080p 60 fps
+a 8 Mbps com 3 pessoas seriam 24 Mbps. Agora, ao transmitir, existe "Upload total da transmissão" (padrão 10 Mbps),
+que o app divide entre quem assiste e reajusta sozinho quando alguém entra ou sai. No bloco da sua transmissão
+aparece ao vivo: fps reais, Mbps e, se houver, "limitado pela internet de envio" ou "limitado pelo processador"
+(o chat também avisa). O botão de diagnóstico mostra o codificador em uso.
+Dicas: para jogo, use tela inteira sem borda (modo janela sem bordas) ou compartilhe a TELA em vez da janela;
+cabo de rede em vez de Wi-Fi; codec H.264 (placa de vídeo); 1080p 30 fps ou 720p 60 fps para 3 ou mais pessoas.
+
+RUÍDO, TECLADO E ECO
+- Configurações > "Processamento do microfone": agora o padrão é "Com cancelamento de eco". O modo "Jogos"
+  desliga o cancelamento de eco (só use com fone, senão quem está na call ouve a própria voz de volta).
+- Configurações > "Filtro extra de ruído (teclado, mouse)": Normal (padrão), Forte ou Desligado. É uma porta de
+  ruído com antecipação de 40 ms: só deixa passar voz sustentada, então estalos curtos (teclas, mouse, copo) são
+  abafados e o início das palavras é preservado. Forte é mais rígido e pode cortar voz muito baixa.
+- Limite: digitar ENQUANTO fala ainda passa (nenhum filtro desse tipo separa as duas coisas); nesse caso quem
+  ajuda é o supressor do navegador, que já fica ligado. Se o filtro não iniciar no aparelho, o app volta sozinho
+  ao microfone normal em vez de ficar mudo.
+- Para ainda mais qualidade, o próximo passo seria um supressor com rede neural (RNNoise), que exige incluir uma
+  biblioteca WebAssembly no projeto.
+
 DEPOIS DE EDITAR O sala.html
   npm run selar     (atualiza o hash da política de segurança, igual ao computador)
   npm run mobile:sync
@@ -67,6 +128,7 @@ COMO FUNCIONA POR DENTRO
 - mobile/build-web.js: copia o sala.html (já selado) para www/index.html.
 - mobile/init.js: cria android/ e ios/ com o Capacitor e aplica os ajustes de forma repetível
   (permissões, serviço de call, Info.plist). Pode rodar de novo à vontade.
-- mobile/android/: o serviço de call em segundo plano (Java), copiado para o projeto Android.
+- mobile/android/: o serviço de call em segundo plano e o atualizador (Java), copiados para o projeto Android.
+- mobile/gerar-chave.js: cria a chave de assinatura do APK (npm run mobile:chave).
 - sala.html: bloco "Celular" no fim do script (detecta o app, esconde o botão de tela, liga o serviço,
   trata o botão Voltar). No computador e no navegador esse bloco não faz nada.
